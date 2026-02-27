@@ -32,7 +32,7 @@ This project contains the ETL pipeline for the Customer 360 data processing in D
 - Click Create.
 
 - Move the Folder to Workspace 
-- 
+
 - Click on the folder databricks_customer_360_etl_pipeline in your workspace.
 
 - Inside the folder, you will see the project structure:
@@ -63,6 +63,10 @@ This project contains the ETL pipeline for the Customer 360 data processing in D
 
 - Change the email from yaml file to your mail id asociated with databricks account.
 
+- uncomment below 3 lines from notebook "data to source" for the initial run.
+  -  NUM_CUSTOMERS = 3 
+  -  NUM_PRODUCTS = 2   
+  -  NUM_SALES = 10
 
 #### **Folder Structure**
 
