@@ -2,21 +2,15 @@ resources:
   jobs:
     CUSTOMER_360_JOB:
       name: CUSTOMER_360_JOB
-      email_notifications:
-        on_start:
-          - niladribiswas.kasba@gmail.com
-        on_success:
-          - niladribiswas.kasba@gmail.com
-        on_failure:
-          - niladribiswas.kasba@gmail.com
       schedule:
-        quartz_cron_expression: 7 0 15 ? * Fri
-        timezone_id: Asia/Kolkata
+        quartz_cron_expression: 32 50 15 ? * Fri
+        timezone_id: Asia/Calcutta
         pause_status: UNPAUSED
       tasks:
         - task_key: get_data_into_source
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/data to source
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/data
+              to source
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -34,8 +28,8 @@ resources:
           depends_on:
             - task_key: get_data_into_source
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/source to customer
-              bronze
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/source
+              to customer bronze
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -49,8 +43,8 @@ resources:
           depends_on:
             - task_key: get_data_into_source
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/source to
-              product  bronze
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/source
+              to product  bronze
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -64,7 +58,8 @@ resources:
           depends_on:
             - task_key: get_data_into_source
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/source to sales bronze
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/source
+              to sales bronze
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -80,7 +75,8 @@ resources:
             - task_key: load_to_bronze_product
             - task_key: load_to_bronze_sales
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/optimize bronze tables
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/optimize
+              bronze tables
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -94,8 +90,8 @@ resources:
           depends_on:
             - task_key: optimize_bronze_tables
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/bronze to silver
-              customer
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/bronze
+              to silver customer
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -109,7 +105,8 @@ resources:
           depends_on:
             - task_key: optimize_bronze_tables
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/bronze to silver product
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/bronze
+              to silver product
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -123,7 +120,8 @@ resources:
           depends_on:
             - task_key: optimize_bronze_tables
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/bronze to silver sales
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/bronze
+              to silver sales
             source: WORKSPACE
           min_retry_interval_millis: 15000
           retry_on_timeout: true
@@ -138,7 +136,8 @@ resources:
             - task_key: load_to_silver_dim_product
             - task_key: load_to_silver_dim_customer
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/optimize silver tables
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/optimize
+              silver tables
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -152,7 +151,8 @@ resources:
           depends_on:
             - task_key: optimize_silver_tables
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/silver to gold customer
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/silver
+              to gold customer
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -162,7 +162,8 @@ resources:
           depends_on:
             - task_key: optimize_silver_tables
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/silver to gold product
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/silver
+              to gold product
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -172,7 +173,8 @@ resources:
           depends_on:
             - task_key: optimize_silver_tables
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/silver to gold sales
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/silver
+              to gold sales
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
@@ -184,17 +186,20 @@ resources:
             - task_key: load_to_gold_dim_product
             - task_key: load_to_gold_fact_sales
           notebook_task:
-            notebook_path: /Workspace/customer_360_pipeline/notebooks/optimize gold tables
+            notebook_path: /Workspace/databricks_customer_360_etl_pipeline/customer_360_pipeline/notebooks/optimize
+              gold tables
             source: WORKSPACE
           max_retries: 1
           min_retry_interval_millis: 15000
           retry_on_timeout: true
           disable_auto_optimization: false
           email_notifications:
+            on_start:
+              - shandro.backup1@gmail.com
             on_success:
-              - shandromitra@gmail.com
+              - shandro.backup1@gmail.com
             on_failure:
-              - shandromitra@gmail.com
+              - shandro.backup1@gmail.com
           notification_settings:
             alert_on_last_attempt: true
       queue:
