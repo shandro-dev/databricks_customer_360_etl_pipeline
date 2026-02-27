@@ -1,0 +1,208 @@
+resources:
+  jobs:
+    CUSTOMER_360_JOB:
+      name: CUSTOMER_360_JOB
+      email_notifications:
+        on_start:
+          - niladribiswas.kasba@gmail.com
+        on_success:
+          - niladribiswas.kasba@gmail.com
+        on_failure:
+          - niladribiswas.kasba@gmail.com
+      schedule:
+        quartz_cron_expression: 7 0 15 ? * Fri
+        timezone_id: Asia/Kolkata
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: get_data_into_source
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/data to source
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          email_notifications:
+            on_start:
+              - Shandromitra@gmail.com
+            on_failure:
+              - Shandromitra@gmail.com
+          notification_settings:
+            alert_on_last_attempt: true
+          environment_key: get_data_into_source_environment
+        - task_key: load_to_bronze_customer
+          depends_on:
+            - task_key: get_data_into_source
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/source to customer
+              bronze
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: load_to_bronze_product
+          depends_on:
+            - task_key: get_data_into_source
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/source to
+              product  bronze
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: load_to_bronze_sales
+          depends_on:
+            - task_key: get_data_into_source
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/source to sales bronze
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: optimize_bronze_tables
+          depends_on:
+            - task_key: load_to_bronze_customer
+            - task_key: load_to_bronze_product
+            - task_key: load_to_bronze_sales
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/optimize bronze tables
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: load_to_silver_dim_customer
+          depends_on:
+            - task_key: optimize_bronze_tables
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/bronze to silver
+              customer
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: load_to_silver_dim_product
+          depends_on:
+            - task_key: optimize_bronze_tables
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/bronze to silver product
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: load_to_silver_fact_sales
+          depends_on:
+            - task_key: optimize_bronze_tables
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/bronze to silver sales
+            source: WORKSPACE
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: optimize_silver_tables
+          depends_on:
+            - task_key: load_to_silver_fact_sales
+            - task_key: load_to_silver_dim_product
+            - task_key: load_to_silver_dim_customer
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/optimize silver tables
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          notification_settings:
+            no_alert_for_skipped_runs: true
+            no_alert_for_canceled_runs: true
+            alert_on_last_attempt: true
+        - task_key: load_to_gold_dim_customer
+          depends_on:
+            - task_key: optimize_silver_tables
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/silver to gold customer
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+        - task_key: load_to_gold_dim_product
+          depends_on:
+            - task_key: optimize_silver_tables
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/silver to gold product
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+        - task_key: load_to_gold_fact_sales
+          depends_on:
+            - task_key: optimize_silver_tables
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/silver to gold sales
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+        - task_key: optimize_gold_tables
+          depends_on:
+            - task_key: load_to_gold_dim_customer
+            - task_key: load_to_gold_dim_product
+            - task_key: load_to_gold_fact_sales
+          notebook_task:
+            notebook_path: /Workspace/customer_360_pipeline/notebooks/optimize gold tables
+            source: WORKSPACE
+          max_retries: 1
+          min_retry_interval_millis: 15000
+          retry_on_timeout: true
+          disable_auto_optimization: false
+          email_notifications:
+            on_success:
+              - shandromitra@gmail.com
+            on_failure:
+              - shandromitra@gmail.com
+          notification_settings:
+            alert_on_last_attempt: true
+      queue:
+        enabled: true
+      environments:
+        - environment_key: get_data_into_source_environment
+          spec:
+            dependencies:
+              - -r /Workspace/customer_360_pipeline/requirements.txt
+            environment_version: "4"
+      performance_target: PERFORMANCE_OPTIMIZED
