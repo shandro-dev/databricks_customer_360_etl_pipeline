@@ -195,11 +195,11 @@ resources:
           disable_auto_optimization: false
           email_notifications:
             on_start:
-              - shandro.backup1@gmail.com
+              - shandromitra@gmail.com
             on_success:
-              - shandro.backup1@gmail.com
+              - shandromitra@gmail.com
             on_failure:
-              - shandro.backup1@gmail.com
+              - shandromitra@gmail.com
           notification_settings:
             alert_on_last_attempt: true
       queue:
